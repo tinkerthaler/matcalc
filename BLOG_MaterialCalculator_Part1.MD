@@ -47,6 +47,15 @@ It turned out to be amazingly simple
 
 ... except for one caveat (admittedly I hadn't really read the documentation well) the configuration file is typed! Initially I had my values wrapped in quotes but the lookup failed because I needed a Float and my configuration had a String. Amazing!
 
+In the next posts I plan to:
+
+* Add a GUI layer
+* Add a REST layer
+* Extend the functionality
+
+[1] [Paint Calculator](http://www.resene.co.nz/homeown/how_to_diy/paint_calculator.pdf)
+[2] [24 days of hackage: configurator](https://ocharles.org.uk/blog/posts/2012-12-21-24-days-of-hackage-configurator.html)
+
 Here is the full code (needs some cleanup)
 
 	{-# LANGUAGE OverloadedStrings #-}
