@@ -8,6 +8,7 @@ Sample usage (on [NixOS](http://nixos.org/))
 
 	git clone https://github.com/tinkerthaler/matcalc
 	cd matcalc
+	git checkout part1
 	nix-shell
 	ghci
 
