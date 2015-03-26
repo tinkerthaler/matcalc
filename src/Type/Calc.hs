@@ -9,10 +9,7 @@ module Type.Calc (Calc) where
 
 import Data.Aeson
 import Data.JSON.Schema
-import Data.Text (Text)
 import Data.Time (UTCTime)
-import Data.Typeable
-import GHC.Generics
 import Generics.Regular
 import Generics.Regular.XmlPickler
 import Text.XML.HXT.Arrow.Pickle

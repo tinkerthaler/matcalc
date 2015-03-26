@@ -9,7 +9,6 @@ module MatCalc where
 
 import qualified Data.Configurator as C
 import qualified Data.Maybe as M
-import Control.Monad.Trans.Class (lift)
 import GHC.Generics
 import Data.Typeable
 --import Control.Monad
