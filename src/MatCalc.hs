@@ -1,9 +1,17 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE
+    DeriveDataTypeable
+  , DeriveGeneric
+  , TemplateHaskell
+  , TypeFamilies
+  , OverloadedStrings
+  #-}
 module MatCalc where
 
 import qualified Data.Configurator as C
 import qualified Data.Maybe as M
 import Control.Monad.Trans.Class (lift)
+import GHC.Generics
+import Data.Typeable
 --import Control.Monad
 
 {-
@@ -38,6 +46,9 @@ data Material = Paint | Tape
 
 data Unit = Meter
 
+data Calc = Calc { c :: Float } deriving (Eq, Generic, Ord, Show, Typeable)
+
+
 area :: Shape -> Float
 area (Square s) = s * s
 area (Rectangle s1 s2) = s1 * s2
@@ -46,7 +57,7 @@ area (Circle r) = pi * r * r
 
 perimeter :: Shape -> Float
 perimeter (Square s) = 4 * s
-perimeter (Rectangle s1 s2) = 2 * s1 * s2
+perimeter (Rectangle s1 s2) = 2 * (s1 + s2)
 perimeter (Circle r) = 2 * pi * r
 
 {--
@@ -56,14 +67,16 @@ perimeter (Circle r) = 2 * pi * r
    multiplied by number of coats
    = total litres required
  --}
---calc :: SurfaceLoc -> Material -> Surface -> Float
+calc :: SurfaceLoc -> Material -> Surface -> IO Calc
 calc Interior Paint s = do
 	cfg           <- C.load [ C.Required "MatCalc.cfg" ]
 	desc          <- C.lookupDefault "" cfg "interior.paint.desc"
 	putStrLn desc
 	spreadingRate <- C.lookup cfg "interior.paint.spreadingRate"
 	coats         <- C.lookup cfg "interior.paint.coats"
-	return $ area (unSurface s) / (M.fromJust spreadingRate) * (M.fromJust coats)
+	return $ Calc $ area (unSurface s) / 
+                         (M.fromJust spreadingRate) * 
+                         (M.fromJust coats)
 --calc Interior Tape  s = 
 --	perimeter (unSurface s)
 --calc _ _ _ = undefined
