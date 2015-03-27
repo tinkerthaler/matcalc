@@ -6,6 +6,8 @@ We will use the silk rest framework (see [this tutorial]([1])) on top of happsta
 
 I'm rather new to this library myself so bare with me.
 
+The code can be found on [github]([2])
+
 Let's look at the API documentation
 
     data Resource m s sid mid aid
@@ -42,11 +44,11 @@ sid : ()
 mid : Void
 aid : Void
 
-So our resource has type 
+Thus the resource type is: 
 
-    resource :: Resource IO IO String Void Void
+    resource :: Resource IO IO () Void Void
 
-We are using a POST here (update in the Schema) with a JSON payload. Note how the JSON payload is converted into a Rectangle Shape and then passed on to the calc function!
+We are using a POST here (create in the Schema) with a JSON payload. Note how the JSON payload is converted into a Rectangle Shape and then passed on to the calc function!
 
     post :: Handler IO
     post = mkInputHandler xmlJson $ \s ->
@@ -85,6 +87,8 @@ It's quite something! The best way to approach it is to start by understanding t
     
     The Dict datatype containing sub-dictionaries for translation of identifiers (i), headers (h), parameters (p), inputs (i), outputs (o), and errors (e). Inputs, outputs and errors can have multiple associated dictionaries.
 
+I ran into many issues while developing this. Hopefully this can be of any help to others:
+
 Issue
 
     src/Type/Shape.hs:25:42:
@@ -115,3 +119,4 @@ As the error says... a missing key in my JSON. Apparently the automatic Object t
 
 
 [1] http://silkapp.github.io/rest/tutorial.html
+[2] https://github.com/tinkerthaler/matcalc/tree/part2
