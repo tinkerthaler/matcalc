@@ -28,4 +28,4 @@ post = mkInputHandler xmlJson $ \s ->
                         liftIO $ runCalc s
 
 runCalc :: T.Shape -> IO T.Calc
-runCalc s = S.calc S.Interior S.Paint $ S.Surface $ s
+runCalc = S.calc S.Interior S.Paint . S.Surface
