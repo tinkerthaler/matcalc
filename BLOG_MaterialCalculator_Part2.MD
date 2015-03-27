@@ -28,7 +28,6 @@ In our case we don't have subresources so I guess we should go for mkResourceId.
 
 Now let's start to play a bit in ghci
 
-    :l MatCalc
     import Rest
     import qualified Rest.Resource as R
 
