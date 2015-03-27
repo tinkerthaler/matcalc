@@ -110,7 +110,7 @@ Instead this is covered by the modules in the Api.Type package. For example:
 
 Here we import the Shape data type and re-export it. Our REST Api needs to import it from here.
 
-I ran into many issues while developing this. Hopefully this can be of any help to others:
+On a final note: I ran into many issues while developing this. The runtime error information is very limited but once you find the solution you'll notice that the error was mostly actually pretty accurate... I guess this a matter of training but hopefully these pointers can be of any help to others:
 
 Issue
 
