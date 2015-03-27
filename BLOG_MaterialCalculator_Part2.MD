@@ -106,6 +106,13 @@ It's quite something! The best way to approach it is to start by understanding t
 
 Our main MatCalc module is not aware of the REST layer so the data types are no instances of ToJSON and FromJSON.
 
+    data Shape = 
+          Square Float
+        | Circle Float
+        | Rectangle { s1 :: Float, s2 :: Float }
+        | Raw Float
+      deriving (Eq, Generic, Ord, Show, Typeable)
+
 Instead this is covered by the modules in the Api.Type package. For example:
 
     module Api.Type.Shape (Shape (..)) where
@@ -116,6 +123,8 @@ Instead this is covered by the modules in the Api.Type package. For example:
     instance FromJSON   Shape
 
 Here we import the Shape data type and re-export it. Our REST Api needs to import it from here.
+
+In the next post I will setup some CI around this. Stay tuned!
 
 On a final note: I ran into many issues while developing this. The runtime error information is very limited but once you find the solution you'll notice that the error was mostly actually pretty accurate... I guess this a matter of training but hopefully these pointers can be of any help to others:
 
@@ -143,10 +152,25 @@ Issue
 
 Solution
 
-As the error says... a missing key in my JSON. Apparently the automatic Object to JSON conversion maps a constructor (Rectangle is a constructor of the Shape data type) to a tag in JSON.
+As the error says... a missing key in my JSON. 
+
+I found this out by using GHCI 
+
+    $ ghci
+    GHCi, version 7.8.4: http://www.haskell.org/ghc/  :? for help
+    Prelude> :l Api/Type/Shape.hs 
+    [1 of 2] Compiling MatCalc          ( MatCalc.hs, interpreted )
+    [2 of 2] Compiling Api.Type.Shape   ( Api/Type/Shape.hs, interpreted )
+    Ok, modules loaded: Api.Type.Shape, MatCalc.
+    *Api.Type.Shape> toJSON $ Rectangle 6 3
+    Object (fromList [("s1",Number 6.0),("tag",String "Rectangle"),("s2",Number 3.0)])
+
+So apparently the automatic Object to JSON conversion maps a constructor (Rectangle is a constructor of the Shape data type) to a tag in JSON.
+
+I adapted the JSON body in my curl
 
     curl -s -X PUT 'http://localhost:3000/v1.0/matcalc' -H "Content-Type:application/json" -d '{"Rectangle": { "tag": "Rectangle", "s1":3,"s2":6}}' | python -mjson.tool
 
-
 [1] http://silkapp.github.io/rest/tutorial.html
+
 [2] https://github.com/tinkerthaler/matcalc/tree/part2
