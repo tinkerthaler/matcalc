@@ -2,13 +2,11 @@
 
 In this part we are going to add a rest layer around around calc function.
 
-We will use the silk rest framework (see [this tutorial]([1])) on top of happstack.
+We will use the silk rest framework (see [this tutorial]([1])) on top of happstack. I'm rather new to this library myself so bare with me.
 
-I'm rather new to this library myself so bare with me.
+The code can be found on [github]([2] in the _part2_ branch)
 
-The code can be found on [github]([2])
-
-Let's look at the API documentation
+So first let's look at the REST API documentation for a Resource:
 
     data Resource m s sid mid aid
     m & s represent the context for the handlers
