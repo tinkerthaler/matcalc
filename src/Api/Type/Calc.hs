@@ -5,7 +5,7 @@
   , TemplateHaskell
   , TypeFamilies
   #-}
-module Type.Calc (Calc) where
+module Api.Type.Calc (Calc) where
 
 import Data.Aeson
 import Data.JSON.Schema

@@ -18,10 +18,9 @@ cabal-version:       >=1.10
 library
   exposed-modules:      MatCalc
                         Api
-                        Api.MatCalc
-                        Type.Calc
-                        Type.Shape
-                        ApiTypes
+                        Api.MatCalcApi
+                        Api.Type.Calc
+                        Api.Type.Shape
   -- other-modules:       
   other-extensions:     OverloadedStrings
   build-depends:        base >=4.7 && <4.8

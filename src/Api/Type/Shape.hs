@@ -7,7 +7,7 @@
   , TypeSynonymInstances
   , FlexibleInstances
   #-}
-module Type.Shape (Shape (..)) where
+module Api.Type.Shape (Shape (..)) where
 
 import Data.Aeson
 import Data.JSON.Schema
