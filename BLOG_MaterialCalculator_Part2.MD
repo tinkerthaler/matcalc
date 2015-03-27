@@ -36,10 +36,10 @@ Now let's start to play a bit in ghci
 So basically what we've done is created a resource with name *matcalc*. We provided it with a schema that has _noListing_ because it doesn't make sense to list calculations (contrary to other resources such as blog posts).
 
 We used String here for the sid but in our example we don't really need the single identifier so our final type parameters are:
-m and s are IO
-sid : ()
-mid : Void
-aid : Void
+m and s are IO  
+sid : ()  
+mid : Void  
+aid : Void  
 
 Before continuing, here is the structure
 
