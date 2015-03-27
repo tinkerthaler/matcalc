@@ -42,13 +42,13 @@ We used String here for the sid but in our example we don't really need the sing
 * mid : Void  
 * aid : Void  
 
-Before continuing, here is the structure
+Before continuing, here is the project structure
 
     src
-    Api.hs: routing, versioning, etc.
-    MatCalc.hs: Module containing our core functionlity
-    |- Api: Contains REST API layer which defines the verbs for the resource
-    |- Type: Contains wrappers to the existing types (e.g. add ToJSON, FromJSON instances)
+    |- Api.hs: routing, versioning, etc.
+    |- MatCalc.hs: Module containing our core functionlity
+    |-- Api: Contains REST API layer which defines the verbs for the resource
+    |-- Type: Contains wrappers to the existing types (e.g. add ToJSON, FromJSON instances)
 
 We start with our Api/MatCalcApi.hs
 
@@ -63,9 +63,9 @@ We are using a POST here (create in the Schema) with a JSON payload. Note how th
                             liftIO $ runCalc s
 
     runCalc :: T.Shape -> IO T.Calc
-    runCalc s = S.calc S.Interior S.Paint $ S.Surface $ s
+    runCalc = S.calc S.Interior S.Paint . S.Surface
 
-The ```runCalc``` function should be obvious. We just call the actual calc from our internal ```MatCalc``` library.
+The ```runCalc``` function should be obvious. We just call the actual calc from our internal ```MatCalc``` library. Here we can see that our return type is T.Calc which is a re-exported type from the MatCalc module. More on that later.
 
 The ```post``` function uses one of the mk*Handlers. Here is the list from the API docs:
 
@@ -93,7 +93,16 @@ It's quite something! The best way to approach it is to start by understanding t
 
     data Dict h p i o e Source
     
-    The Dict datatype containing sub-dictionaries for translation of identifiers (i), headers (h), parameters (p), inputs (i), outputs (o), and errors (e). Inputs, outputs and errors can have multiple associated dictionaries.
+    The Dict datatype containing sub-dictionaries for translation of 
+
+    identifiers (i), 
+    headers (h), 
+    parameters (p), 
+    inputs (i), 
+    outputs (o), and 
+    errors (e). 
+
+    Inputs, outputs and errors can have multiple associated dictionaries.
 
 Our main MatCalc module is not aware of the REST layer so the data types are no instances of ToJSON and FromJSON.
 
