@@ -5,13 +5,19 @@
   , TypeFamilies
   , OverloadedStrings
   #-}
-module MatCalc where
+module MatCalc ( calc
+               , Shape (..)
+               , Surface (..)
+               , Material (..)
+               , SurfaceLoc (..)
+               , Calc (..)
+               ) 
+where
 
 import qualified Data.Configurator as C
 import qualified Data.Maybe as M
 import GHC.Generics
 import Data.Typeable
---import Control.Monad
 
 {-
 Input: 5 by 5
@@ -32,8 +38,9 @@ Area is 25 m^2
 data Shape = 
 	  Square Float
 	| Circle Float
-	| Rectangle Float Float
+	| Rectangle { s1 :: Float, s2 :: Float }
 	| Raw Float
+  deriving (Eq, Generic, Ord, Show, Typeable)
 
 data Surface = Surface { unSurface :: Shape }
 

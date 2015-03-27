@@ -12,6 +12,6 @@ api = [(mkVersion 1 0 0, Some1 mc)]
 -- _ The entire routing table for v1.0.0 of the material calculator
 mc :: Router IO IO
 mc =
-  root -/ matcalc
+  root -/ matcalc2
   where
-    matcalc         = route MatCalc.resource
+    matcalc2         = route MatCalc.resource

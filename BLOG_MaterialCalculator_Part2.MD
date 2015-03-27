@@ -4,15 +4,17 @@ In this part we are going to add a rest layer around around calc function.
 
 We will use the silk rest framework (see [this tutorial]([1])) on top of happstack.
 
-Looking at the API documentation
+I'm rather new to this library myself so bare with me.
 
-data Resource m s sid mid aid
-m & s represent the context for the handlers
-sid: single identifier
-mid: many resources
-aid: static action
+Let's look at the API documentation
 
-more on it later
+    data Resource m s sid mid aid
+    m & s represent the context for the handlers
+    sid: single identifier
+    mid: many resources
+    aid: static action
+
+So in the next section we'll try to figure out what we need to provide here.
 
 First lets inspect the mk constructors
 
@@ -22,21 +24,94 @@ First lets inspect the mk constructors
     mkResourceReader :: Resource m (ReaderT sid m) sid Void Void
     Make a resource that provides the single resource identifier to its subresources.
 
-Let's start to play a bit in ghci
+In our case we don't have subresources so I guess we should go for mkResourceId.
+
+Now let's start to play a bit in ghci
 
     :l MatCalc
     import Rest
     import qualified Rest.Resource as R
 
-    let resource = mkResourceId { R.name = "calc" , R.schema = noListing $ unnamedSingle  id, R.get = undefined     } :: Resource IO IO String Void Void
+    let resource = mkResourceId { R.name = "matcalc" , R.schema = noListing $ unnamedSingle  id     } :: Resource IO IO String Void Void
 
-So basically what we've done is created a resource with name *calc*. We provided it with a schema that has _noListing_ because it doesn't make sense to list calculations (contrary to other resources such as posts)
+So basically what we've done is created a resource with name *matcalc*. We provided it with a schema that has _noListing_ because it doesn't make sense to list calculations (contrary to other resources such as blog posts).
 
-Our type parameters are:
+We used String here for the sid but in our example we don't really need the single identifier so our final type parameters are:
 m and s are IO
-sid : String (or Float?)
+sid : ()
 mid : Void
 aid : Void
+
+So our resource has type 
+
+    resource :: Resource IO IO String Void Void
+
+We are using a POST here (update in the Schema) with a JSON payload. Note how the JSON payload is converted into a Rectangle Shape and then passed on to the calc function!
+
+    post :: Handler IO
+    post = mkInputHandler xmlJson $ \s ->
+                            liftIO $ runCalc s
+
+    runCalc :: T.Shape -> IO T.Calc
+    runCalc s = S.calc S.Interior S.Paint $ S.Surface $ s
+
+The ```runCalc``` function should be obvious. We just call the actual calc from our internal ```MatCalc``` library.
+
+The ```post``` function uses one of the mk*Handlers. Here is the list from the API docs:
+
+    mkHandler
+    Create a handler for a single resource. Takes the entire environmend as input.
+
+    mkInputHandler
+    Create a handler for a single resource. Takes only the body information as input.
+
+    mkConstHandler
+    Create a handler for a single resource. Doesn't take any input.
+
+    mkIdHandler
+    Create a handler for a single resource. Take body information and the resource identifier as input. The monad m should be a Reader-like type containing the idenfier. 
+
+In our case we are taking the (JSON) body as input.
+
+The next one is easy: depending on whether you have input, output or input/output you choose one of ```xmlJsonI```, ```xmlJsonO``` or ```xmlJson```.
+
+Let's quickly look at the type for xmlJson
+
+    xmlJson :: (Typeable i, FromJSON i, JSONSchema i, XmlPickler i, Typeable o, ToJSON o, JSONSchema o, XmlPickler o, FromMaybe i i' ~ i, FromMaybe o o' ~ o) => Dict h p i' o' e -> Dict h p (Just i) (Just o) e 
+
+It's quite something! The best way to approach it is to start by understanding the h, p, i', o' and e which are explained in the API of Dict:
+
+    data Dict h p i o e Source
+    
+    The Dict datatype containing sub-dictionaries for translation of identifiers (i), headers (h), parameters (p), inputs (i), outputs (o), and errors (e). Inputs, outputs and errors can have multiple associated dictionaries.
+
+Issue
+
+    src/Type/Shape.hs:25:42:
+        No instance for (generic-deriving-1.7.0:Generics.Deriving.ConNames.ConNames
+                           (GHC.Generics.Rep Shape))
+          arising from a use of ‘gSchema’
+        In the expression: gSchema
+        In an equation for ‘schema’: schema = gSchema
+        In the instance declaration for ‘JSONSchema Shape’
+
+Solution
+
+    Add  deriving (Eq, Generic, Ord, Show, Typeable) to Shape
+
+Issue
+
+    {
+        "inputError": {
+            "parseError": "key \"tag\" not present"
+        }
+    }
+
+Solution
+
+As the error says... a missing key in my JSON. Apparently the automatic Object to JSON conversion maps a constructor (Rectangle is a constructor of the Shape data type) to a tag in JSON.
+
+    curl -s -X PUT 'http://localhost:3000/v1.0/matcalc' -H "Content-Type:application/json" -d '{"Rectangle": { "tag": "Rectangle", "s1":3,"s2":6}}' | python -mjson.tool
 
 
 [1] http://silkapp.github.io/rest/tutorial.html

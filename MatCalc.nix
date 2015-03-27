@@ -2,8 +2,9 @@
 
 { cabal, aeson, configurator, filepath, genericAeson
 , happstackServer, hxt, jsonSchema, mtl, regular, regularXmlpickler
-, restCore, restHappstack, safe, stm, text, time, transformers
-, transformersBase, transformersCompat, unorderedContainers
+, restCore, restHappstack, restTypes, safe, stm, text, time
+, transformers, transformersBase, transformersCompat
+, unorderedContainers
 }:
 
 cabal.mkDerivation (self: {
@@ -15,8 +16,8 @@ cabal.mkDerivation (self: {
   buildDepends = [
     aeson configurator filepath genericAeson happstackServer hxt
     jsonSchema mtl regular regularXmlpickler restCore restHappstack
-    safe stm text time transformers transformersBase transformersCompat
-    unorderedContainers
+    restTypes safe stm text time transformers transformersBase
+    transformersCompat unorderedContainers
   ];
   meta = {
     description = "Material calculator";

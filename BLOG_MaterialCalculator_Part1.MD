@@ -8,12 +8,10 @@ Next I started defining some base functions such as ```area``` and ```perimeter`
 
 	area :: Shape -> Float
 	area (Square s) = s * s
-	area (Rectangle s1 s2) = s1 * s2
+	area (Rectangle s1 s2) = 2 * (s1 + s2)
 	area (Circle r) = pi * r * r
 
 Square is actually a special case of Rectangle but for now I'll just keep it like that.
-
-```perimter``` is similar.
 
 Next up is the calculation function. First of all let's consider the actual calculation we are going to use (I'm sure there are plenty but feel free to plug in your own):
 
@@ -33,7 +31,7 @@ That's what I'd advice novice Haskell developers (which include myself!): don't 
 
 One mistake I made was to try to put in place a Reader Monad at start and spent an hour or so reading documentation, complicating my code and basically messing up without actually seeing anything on my ghci prompt...
 
-Eventually after some more googling I came across the 24days of haskell post about configurator and given I trust both the post writer, Ollie, as well as the configurator library writer, Bryan 'O Sullivan I decided to go for it.
+Eventually after some more googling I came across the 24days of haskell post about configurator, written by Ollie Charles (the framework is created by Bryan O'Sullivan). I decided to go for it.
 
 It turned out to be amazingly simple
 
@@ -45,89 +43,14 @@ It turned out to be amazingly simple
 		}
 	}
 
-... except for one caveat (admittedly I hadn't really read the documentation well) the configuration file is typed! Initially I had my values wrapped in quotes but the lookup failed because I needed a Float and my configuration had a String. Amazing!
+... except for one caveat (admittedly I hadn't really read the documentation well) the configuration file is typed! Initially I had my values wrapped in quotes but the lookup failed because I needed a Float and my configuration had a String. Cool!
 
 In the next posts I plan to:
 
-* Add a GUI layer
 * Add a REST layer
+* Add a GUI layer
 * Extend the functionality
 
 [1] [Paint Calculator](http://www.resene.co.nz/homeown/how_to_diy/paint_calculator.pdf)
 [2] [24 days of hackage: configurator](https://ocharles.org.uk/blog/posts/2012-12-21-24-days-of-hackage-configurator.html)
 
-Here is the full code (needs some cleanup)
-
-	{-# LANGUAGE OverloadedStrings #-}
-	module MatCalc where
-
-	import qualified Data.Configurator as C
-	import qualified Data.Maybe as M
-	import Control.Monad.Trans.Class (lift)
-	--import Control.Monad
-
-	{-
-	Input: 5 by 5
-	List of materials
-
-	Output:
-
-	Area is 25 m^2
-
-	-}
-
-	-- TODO: GADT
-
-	--defaultSpreadingRate = 11 :: Float -- m^2 / L
-	--defaultCoats Interior= 2  :: Float
-	--defaultCoats Exterior= 2  :: Float
-
-	data Shape = 
-		  Square Float
-		| Circle Float
-		| Rectangle Float Float
-		| Raw Float
-
-	data Surface = Surface { unSurface :: Shape }
-
-	data SurfaceLoc = Interior | Exterior
-
-	data SurfaceType = Ceiling | Wall | Door | Window
-
-	data Material = Paint | Tape
-
-	data Unit = Meter
-
-	area :: Shape -> Float
-	area (Square s) = s * s
-	area (Rectangle s1 s2) = s1 * s2
-	area (Circle r) = pi * r * r
-	--area (Raw r) = r
-
-	perimeter :: Shape -> Float
-	perimeter (Square s) = 4 * s
-	perimeter (Rectangle s1 s2) = 2 * s1 * s2
-	perimeter (Circle r) = 2 * pi * r
-
-	{--
-	   Paint:
-	   Total surface area (square metres)
-	   divided by spreading rate of paint
-	   multiplied by number of coats
-	   = total litres required
-	 --}
-	--calc :: SurfaceLoc -> Material -> Surface -> Float
-	calc Interior Paint s = do
-		cfg           <- C.load [ C.Required "MatCalc.cfg" ]
-		desc          <- C.lookupDefault "" cfg "interior.paint.desc"
-		putStrLn desc
-		spreadingRate <- C.lookup cfg "interior.paint.spreadingRate"
-		coats         <- C.lookup cfg "interior.paint.coats"
-		return $ area (unSurface s) / (M.fromJust spreadingRate) * (M.fromJust coats)
-	--calc Interior Tape  s = 
-	--	perimeter (unSurface s)
-	--calc _ _ _ = undefined
-
-	-- HELPER
-	toFloat :: Integral a => a -> Float
-	toFloat = fromInteger . toInteger
