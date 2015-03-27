@@ -44,7 +44,17 @@ sid : ()
 mid : Void
 aid : Void
 
-Thus the resource type is: 
+Before continuing, here is the structure
+
+    src
+    Api.hs: routing, versioning, etc.
+    MatCalc.hs: Module containing our core functionlity
+    |- Api: Contains REST API layer which defines the verbs for the resource
+    |- Type: Contains wrappers to the existing types (e.g. add ToJSON, FromJSON instances)
+
+We start with our Api/MatCalcApi.hs
+
+The resource type is: 
 
     resource :: Resource IO IO () Void Void
 
@@ -86,6 +96,19 @@ It's quite something! The best way to approach it is to start by understanding t
     data Dict h p i o e Source
     
     The Dict datatype containing sub-dictionaries for translation of identifiers (i), headers (h), parameters (p), inputs (i), outputs (o), and errors (e). Inputs, outputs and errors can have multiple associated dictionaries.
+
+Our main MatCalc module is not aware of the REST layer so the data types are no instances of ToJSON and FromJSON.
+
+Instead this is covered by the modules in the Api.Type package. For example:
+
+    module Api.Type.Shape (Shape (..)) where
+    ...
+    import MatCalc (Shape(..))
+    ...
+    instance ToJSON     Shape
+    instance FromJSON   Shape
+
+Here we import the Shape data type and re-export it. Our REST Api needs to import it from here.
 
 I ran into many issues while developing this. Hopefully this can be of any help to others:
 
